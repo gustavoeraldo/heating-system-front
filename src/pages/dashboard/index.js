@@ -19,14 +19,14 @@ import './styles.css';
 function Dashboard() {
   const { Option } = Select;
   const dispatch = useDispatch();
-  const { basic_config } = useSelector((state) => state.BasicConfigurationReducer);
+  const { basic_config, measurements } = useSelector((state) => state.BasicConfigurationReducer);
   const [stop, setStop] = useState(0);
   const [measurementState, setMeasurementState] = useState(false);
   const [dataSource, setDataSource] = useState([]);
 
   async function getMeasurements() {
     try {
-      const { data } = await api.get(`/measurements/${5}`)
+      const { data } = await api.get(`/measurements/${1}`, {params: { measurement_type: 3 } })
       .then((response) => response);
 
       setDataSource(data);
@@ -73,11 +73,13 @@ function Dashboard() {
     if(measurementState){
       setTimeout(() => {
         setStop(stop+1);
+
         sendCommandToEsp();
+        dispatch(BasicConfigAction.async_get_measurements(1, 3));
       }, 1000 / basic_config.frequency);
     }
   
-    }, [basic_config, stop, measurementState]);
+    }, [basic_config, stop, measurementState, measurements]);
 
   console.log({measurementState})
 
@@ -91,7 +93,7 @@ function Dashboard() {
       <div class="graph-container">
         <div class="graph">
           <div class="graph-line">
-            <LineGraph dataSource={dataSource} />
+            <LineGraph dataSource={measurements} />
           </div>
         </div>
       </div>

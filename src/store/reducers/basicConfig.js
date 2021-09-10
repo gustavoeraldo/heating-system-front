@@ -11,7 +11,9 @@ const INITIAL_STATE = {
       check_sum: '',
       frequency: 10,
       end_time: ''
-  }
+  },
+
+  measurements: []
 };
 
 const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
@@ -21,6 +23,12 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
             ...state,
             basic_config: action.config,
         }
+
+    case ACTIONS_TYPE.APPEND_MEASUREMENTS:
+      return {
+          ...state,
+          measurements: action.data,
+      };
 
     default:
       return state;
