@@ -1,0 +1,60 @@
+const data = [
+  {
+    name: '10:00 am',
+    sensor3: 37,
+    sensor2: 41,
+    amt: 2400,
+    sensor1: 36,
+    sensor4: 42.7,
+  },
+  {
+    name: '11:00 am',
+    sensor3: 38,
+    sensor2: 41,
+    amt: 2210,
+    sensor1: 37,
+    sensor4: 55,
+  },
+  {
+    name: '12:00 pm',
+    sensor3: 38,
+    sensor2: 45,
+    amt: 2290,
+    sensor1: 39,
+    sensor4: 59.3,
+  },
+  {
+    name: '13:00 pm',
+    sensor3: 39,
+    sensor2: 52,
+    amt: 2000,
+    sensor1: 45,
+    sensor4: 57.6,
+  },
+  {
+    name: '14:00 pm',
+    sensor3: 40,
+    sensor2: 59,
+    amt: 2181,
+    sensor1: 45,
+    sensor4: 38,
+  },
+  {
+    name: '15:00 pm',
+    sensor3: 40,
+    sensor2: 42,
+    amt: 2500,
+    sensor1: 47,
+    sensor4: 37,
+  },
+  {
+    name: '16:00 pm',
+    sensor3: 41,
+    sensor2: 33,
+    amt: 2100,
+    sensor1: 51,
+    sensor4: 53,
+  },
+];
+
+export default data;
