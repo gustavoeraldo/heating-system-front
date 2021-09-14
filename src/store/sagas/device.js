@@ -11,8 +11,8 @@ export function* getSensorResponse({ device_ip, message }) {
           baseURL: `http://${device_ip}`,
           config: {
               headers: {
-                  'content-type': 'application/json',
-                  Accept: 'application/json',
+                  'content-type': '*/*',
+                  Accept: '*/*',
                   'Access-Control-Allow-Origin': '*',
               }
           }

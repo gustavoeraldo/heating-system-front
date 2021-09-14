@@ -47,8 +47,8 @@ function Dashboard() {
       device_ip,
       check_sum } = basic_config; 
 
-    const message = `01${origin}${destiny}${command}${sensor_id}${extra_info}${check_sum}`;
-    dispatch(BasicConfigAction.async_get_sensor_value(device_ip, message));
+    const coded_message = `01${origin}${destiny}${command}${sensor_id}${extra_info}${check_sum}`;
+    dispatch(BasicConfigAction.async_get_sensor_value(device_ip, coded_message));
   }
 
   function saveConfig({ 
