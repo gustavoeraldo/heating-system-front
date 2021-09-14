@@ -7,13 +7,24 @@ import { BasicConfigAction } from '../../actions';
 
 export function* getSensorResponse({ device_ip, message }) {
     try {
-        const { data } = yield Axios.get(`http://${device_ip}/${message}`)
+        const espConnection = Axios.create({
+          baseURL: `http://${device_ip}`,
+          config: {
+              headers: {
+                  'content-type': 'application/json',
+                  Accept: 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+              }
+          }
+        });
+
+        const { data } = yield espConnection.get(`/${message}`)
         .then((response) => response);
         
         // const sensor_value = [data.slice(37, 39), '.', data.slice(39, 41)].join('');
         // const measurement = parseFloat(sensor_value);
 
-        yield saveSensorData(1, 54.5, 3);
+        // yield saveSensorData(5, 54.5, 1);
 
         console.log({ data });
 
@@ -23,7 +34,7 @@ export function* getSensorResponse({ device_ip, message }) {
     }
 }
 
-export function* saveSensorData(user_id=1, measure=31.8, type_id=1) {
+export function* saveSensorData(user_id=5, measure=31.8, type_id=1) {
     try {
         const { data } = yield api.post('/measurements', {
           user_id, measure, type_id

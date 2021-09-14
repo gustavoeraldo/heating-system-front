@@ -8,6 +8,7 @@ import {
   Select,
   Card,
   notification,
+  message,
 } from 'antd';
 import { PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
@@ -26,7 +27,7 @@ function Dashboard() {
 
   async function getMeasurements() {
     try {
-      const { data } = await api.get(`/measurements/${1}`, {params: { measurement_type: 3 } })
+      const { data } = await api.get(`/measurements/${5}`, {params: { measurement_type: 1 } })
       .then((response) => response);
 
       setDataSource(data);
@@ -67,6 +68,8 @@ function Dashboard() {
       check_sum: check_sum.toString(16).padStart(2, "0"),
       frequency
     }));
+
+    message.success('Configuração salva');
   }
 
   useEffect(() => {
@@ -75,7 +78,7 @@ function Dashboard() {
         setStop(stop+1);
 
         sendCommandToEsp();
-        dispatch(BasicConfigAction.async_get_measurements(1, 3));
+        // dispatch(BasicConfigAction.async_get_measurements(1, 3));
       }, 1000 / basic_config.frequency);
     }
   
