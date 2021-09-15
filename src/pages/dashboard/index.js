@@ -7,13 +7,12 @@ import {
   Button, 
   Select,
   Card,
-  notification,
+  Modal,
   message,
 } from 'antd';
 import { PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 import LineGraph from '../../components/graph';
-import api from '../../services/api';
 import { BasicConfigAction } from '../../actions';
 import './styles.css';
 
@@ -23,21 +22,9 @@ function Dashboard() {
   const { basic_config, measurements } = useSelector((state) => state.BasicConfigurationReducer);
   const [stop, setStop] = useState(0);
   const [measurementState, setMeasurementState] = useState(false);
-  const [dataSource, setDataSource] = useState([]);
-
-  async function getMeasurements() {
-    try {
-      const { data } = await api.get(`/measurements/${5}`, {params: { measurement_type: 1 } })
-      .then((response) => response);
-
-      setDataSource(data);
-    } catch (error) {
-      notification.error({ message: 'Error' });
-    }
-  }
+  const [modalVisibility, setModalVisibility] = useState({ confiVisibility: false });
 
   async function sendCommandToEsp() {
-    // 192.168.0.102
     const { 
       origin, 
       destiny, 
@@ -70,6 +57,7 @@ function Dashboard() {
     }));
 
     message.success('Configuração salva');
+    setModalVisibility({ confiVisibility: false });
   }
 
   useEffect(() => {
@@ -83,8 +71,6 @@ function Dashboard() {
     }
   
     }, [basic_config, stop, measurementState, measurements]);
-
-  console.log({measurementState})
 
   return (
     <body>
@@ -101,45 +87,57 @@ function Dashboard() {
         </div>
       </div>
 
-      <Card title="Configuração">
-        <Form title='Configuração' onFinish={saveConfig}>
-          <Form.Item label="Origem" name='origin'>
-            <InputNumber min={0} max={255} />
-          </Form.Item>
+      <Button 
+        key="set-config-btn" 
+        onClick={()=>setModalVisibility({ confiVisibility: true })}
+        >
+          Configurar conexão
+      </Button>
 
-          <Form.Item label="Dispositivo" name='destiny'>
-            <Select>
-              <Option value={1} key="device-01">Dispositivo 1</Option>
-              <Option value={2} key="device-02">Dispositivo 2</Option>
-              <Option value={3} key="device-03">Dispositivo 3</Option>
-              <Option value={4} key="device-04">Dispositivo 4</Option>
-            </Select>
-          </Form.Item>
+      <Modal 
+        visible={modalVisibility.confiVisibility}
+        footer={null}
+        keyboard
+        onCancel={()=>setModalVisibility({ confiVisibility: false })}
+        >
+        <Card title="Configuração">
+          <Form title='Configuração' onFinish={saveConfig}>
+            <Form.Item label="Origem" name='origin'>
+              <InputNumber min={0} max={255} style={{width: '100%'}} />
+            </Form.Item>
 
-          <Form.Item label="Sensor" name='sensor_id'>
-            <Select>
-              <Option value={1} key="sensor-01">Sensor 1</Option>
-              <Option value={2} key="sensor-02">Sensor 2</Option>
-              <Option value={3} key="sensor-03">Sensor 3</Option>
-              <Option value={4} key="sensor-04">Sensor 4</Option>
-            </Select>
-          </Form.Item>
+            <Form.Item label="Dispositivo" name='destiny'>
+              <Select>
+                <Option value={1} key="device-01">Dispositivo 1</Option>
+                <Option value={2} key="device-02">Dispositivo 2</Option>
+                <Option value={3} key="device-03">Dispositivo 3</Option>
+                <Option value={4} key="device-04">Dispositivo 4</Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item label="Frequência" name="frequency" key="frequency">
-            <InputNumber min={1} max={1000} />
-          </Form.Item>
+            <Form.Item label="Sensor" name='sensor_id'>
+              <Select>
+                <Option value={1} key="sensor-01">Sensor 1</Option>
+                <Option value={2} key="sensor-02">Sensor 2</Option>
+                <Option value={3} key="sensor-03">Sensor 3</Option>
+                <Option value={4} key="sensor-04">Sensor 4</Option>
+              </Select>
+            </Form.Item>
 
-          <Form.Item label="IP" name="device_ip">
-            <Input placeholder="000.000.000.000"/>
-          </Form.Item>
+            <Form.Item label="Frequência" name="frequency" key="frequency">
+              <InputNumber min={1} max={1000} style={{width: '100%'}} />
+            </Form.Item>
 
-          <Button type="primary" htmlType="submit">
-            Salvar
-          </Button>
-        </Form>
-      </Card>
+            <Form.Item label="IP" name="device_ip">
+              <Input placeholder="000.000.000.000"/>
+            </Form.Item>
 
-      <Button onClick={getMeasurements}>Get measurements</Button>
+            <Button type="primary" htmlType="submit" style={{width: '100%'}}>
+              Salvar
+            </Button>
+          </Form>
+        </Card>
+      </Modal>
       
       {
         !measurementState ?
