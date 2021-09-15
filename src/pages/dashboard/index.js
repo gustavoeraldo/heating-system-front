@@ -65,7 +65,7 @@ function Dashboard() {
       setTimeout(() => {
         setStop(stop+1);
 
-        sendCommandToEsp();
+        // sendCommandToEsp();
         // dispatch(BasicConfigAction.async_get_measurements(1, 3));
       }, 1000 / basic_config.frequency);
     }
@@ -86,6 +86,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      <Button onClick={()=> sendCommandToEsp()}>get from esp</Button>
 
       <Button 
         key="set-config-btn" 
