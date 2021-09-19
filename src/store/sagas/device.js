@@ -5,10 +5,13 @@ import { put } from 'redux-saga/effects';
 import api from '../../services/api';
 import { BasicConfigAction } from '../../actions';
 
-export function* getSensorResponse({ device_ip, message }) {
+export function* getSensorResponse({ device_ip, payload }) {
     try {
-        const espConnection = Axios.create({
-          baseURL: `http://${device_ip}`,
+        console.log(payload);
+        const esp_ip = localStorage.getItem('device_ip') || device_ip;
+
+        const esp_connection = Axios.create({
+          baseURL: `http://${esp_ip}`,
           config: {
               headers: {
                   'content-type': '*/*',
@@ -18,13 +21,15 @@ export function* getSensorResponse({ device_ip, message }) {
           }
         });
 
-        const { data } = yield espConnection.get(`/${message}`)
+        const { data } = yield esp_connection.get(`/${payload}`)
         .then((response) => response);
         
         // const sensor_value = [data.slice(37, 39), '.', data.slice(39, 41)].join('');
         // const measurement = parseFloat(sensor_value);
-
-        // yield saveSensorData(5, 54.5, 1);
+        
+        // const user_id = localStorage.getItem('user_id');
+        // const measurement_type = localStorage.getItem('measurement_type');
+        // yield saveSensorData(user_id, 54.5, measurement_type);
 
         console.log({ data });
 
@@ -34,10 +39,10 @@ export function* getSensorResponse({ device_ip, message }) {
     }
 }
 
-export function* saveSensorData(user_id=5, measure=31.8, type_id=1) {
+export function* saveSensorData(user_id=5, measure=31.8, measurement_type=1) {
     try {
         const { data } = yield api.post('/measurements', {
-          user_id, measure, type_id
+          user_id, measure, measurement_type
         }).then((response) => response);
     
         return data;

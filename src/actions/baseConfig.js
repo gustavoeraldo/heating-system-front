@@ -10,10 +10,10 @@ export const save_basic_config = (config) => ({
     config,
 });
 
-export const async_get_sensor_value = (device_ip, message) => ({
+export const async_get_sensor_value = (device_ip, payload) => ({
     type: ACTIONS_TYPE.ASYNC_GET_SENSOR_VALUE,
     device_ip,
-    message
+    payload
 });
 
 export const async_get_measurements = (user_id, measurement_type) => ({
