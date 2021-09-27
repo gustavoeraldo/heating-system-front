@@ -37,8 +37,14 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS_TYPE.APPEND_MEASUREMENTS:
       return {
           ...state,
-          measurements: action.data,
+          measurements: [...state.measurements, action.data],
       };
+
+    case ACTIONS_TYPE.SAVE_VALUES: 
+      return {
+        ...state,
+        measurements: action.data,
+      }
 
     default:
       return state;

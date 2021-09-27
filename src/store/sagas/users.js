@@ -9,8 +9,6 @@ export function* getUsers() {
         const { data } = yield api.get('/users')
         .then((response) => response);
 
-        console.log({ data });
-
         if (data.length > 0) {
             data.map((i) => Object.assign(i, { key: `${i.username}` }));
         }
@@ -19,9 +17,23 @@ export function* getUsers() {
         const users_list = data || [{ user_id, user_name: "Local user" }]
       
         yield put(UsersAction.save_users_list(users_list));
-        return data;
+        // return data;
     } catch (error) {
       message.error({ message: 'Error' });
     }
 }
 
+export function* getMeasurementsType() {
+    try {
+        const { data } = yield api.get('/mesure-types').then((response) => response);
+
+        if (data.length > 0) {
+            data.map((i) => Object.assign(i, { key: `${i.m_type_id}` }));
+        }
+        
+        yield put(UsersAction.save_measurements_type_list(data));
+
+    } catch (error) {
+        console.log(error);
+    }
+}

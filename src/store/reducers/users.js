@@ -1,10 +1,11 @@
 import { ACTIONS_TYPE } from '../../actions/usersAction';
 
 const INITIAL_STATE = {
-  user_id: Number,
-  measurement_type: Number,
+  user_id: localStorage.getItem('user_id') || 0,
+  measurement_type: localStorage.getItem('measurement_type') || 'temperature',
 
-  users_list: []
+  users_list: [],
+  m_t_list: []
 };
 
 const UsersReducer = (state = INITIAL_STATE, action) => {
@@ -24,7 +25,12 @@ const UsersReducer = (state = INITIAL_STATE, action) => {
           ...state,
           users_list: action.users_list,
         }
-
+    
+    case ACTIONS_TYPE.SAVE_MEASUREMENTS_LIST: 
+        return {
+          ...state,
+          m_t_list: action.measurement_type_list,
+        };
 
     default:
       return state;
