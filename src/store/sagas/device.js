@@ -24,15 +24,15 @@ export function* getSensorResponse({ device_ip, payload, sensor_tag }) {
         const { data } = yield esp_connection.get(`/${payload}`)
         .then((response) => response);
         
-        // const sensor_value = [data.slice(37, 39), '.', data.slice(39, 41)].join('');
-        // const measurement = parseFloat(sensor_value);
+        const sensor_value = [data.slice(37, 39), '.', data.slice(39, 41)].join('');
+        const measurement = parseFloat(sensor_value);
         
         const user_id = localStorage.getItem('user_id');
-        const measurement_type = localStorage.getItem('measurement_type');
-        const random_number = Math.random()*70
+        // const measurement_type = localStorage.getItem('measurement_type');
+        // const random_number = Math.random()*70
 
-        yield saveSensorData(user_id, random_number.toFixed(2), 1, sensor_tag);
-        return random_number;
+        yield saveSensorData(user_id, measurement.toFixed(2), 1, sensor_tag);
+        // return random_number;
     } catch (error) {
       console.log('Error');
     }
