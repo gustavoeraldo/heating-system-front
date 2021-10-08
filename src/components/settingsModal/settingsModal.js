@@ -22,7 +22,7 @@ function SettingsModal({ visible, onCancel }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   
-  const { users_list, user_id } = useSelector((state) => state.UsersReducer);
+  const { users_list } = useSelector((state) => state.UsersReducer);
   const { basic_config } = useSelector((state) => state.BasicConfigurationReducer);
 
   function saveUserSettings({ user_id, measurement_type }) {
@@ -32,7 +32,7 @@ function SettingsModal({ visible, onCancel }) {
   }
 
   function saveConfig({ 
-    origin = 251, destiny, sensor_id, device_ip, frequency=0.1 }) {
+    origin = 251, destiny, sensor_id, device_ip, frequency }) {
     // 84 is the command in decimal base.
     // 1 is the header value
     let check_sum = [];
@@ -50,7 +50,6 @@ function SettingsModal({ visible, onCancel }) {
     }
 
     // const check_sum = (1 + origin + destiny + 84 + sensor_id + 1274) % 256;
-    console.log(sensors_id.join(','))
     dispatch(BasicConfigAction.save_basic_config({
       origin: origin.toString(16).padStart(2, "0"),
       destiny: destiny.toString(16).padStart(2, "0"),
@@ -58,7 +57,7 @@ function SettingsModal({ visible, onCancel }) {
       command: '54',
       device_ip,
       extra_info: 'FFFFFFFFFFFF',
-      check_sum: check_sum,
+      check_sum: check_sum.join(''),
       frequency
     }));
 
@@ -167,8 +166,8 @@ function SettingsModal({ visible, onCancel }) {
                             </Select>
                         </Form.Item>
 
-                        <Form.Item label="Frequência" name="frequency" key="frequency">
-                            <InputNumber min={1} max={100} style={{width: '100%'}} />
+                        <Form.Item label="Frequência (Hz)" name="frequency" key="frequency">
+                            <InputNumber max={100} style={{width: '100%'}} />
                         </Form.Item>
 
                         <Form.Item label="IP" name="device_ip">

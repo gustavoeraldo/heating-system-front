@@ -1,57 +1,70 @@
 import Axios from 'axios';
-import { notification } from 'antd';
+import { message } from 'antd';
 import { put } from 'redux-saga/effects';
 
 import api from '../../services/api';
+import store from '../index';
 import { BasicConfigAction } from '../../actions';
-import { objectTypeAnnotation } from '@babel/types';
+
 
 export function* getSensorResponse({ device_ip, payload, sensor_tag }) {
-    try {
-        const esp_ip = localStorage.getItem('device_ip') || device_ip;
+  try {
+    const esp_ip = localStorage.getItem('device_ip') || device_ip;
 
-        const esp_connection = Axios.create({
-          baseURL: `http://${esp_ip}`,
-          config: {
-              headers: {
-                  'content-type': '*/*',
-                  Accept: '*/*',
-                  'Access-Control-Allow-Origin': '*',
-              }
+    const esp_connection = Axios.create({
+      baseURL: `http://${esp_ip}`,
+      config: {
+          headers: {
+              'content-type': '*/*',
+              Accept: '*/*',
+              'Access-Control-Allow-Origin': '*',
           }
-        });
+      }
+    });
 
-        const { data } = yield esp_connection.get(`/${payload}`)
-        .then((response) => response);
-        
-        const sensor_value = [data.slice(37, 39), '.', data.slice(39, 41)].join('');
-        const measurement = parseFloat(sensor_value);
-        
-        const user_id = localStorage.getItem('user_id');
-        // const measurement_type = localStorage.getItem('measurement_type');
-        // const random_number = Math.random()*70
+    const { data } = yield esp_connection.get(`/${payload}`)
+    .then((response) => response);
+    
+    // Parsing data
+    const decimal_value = parseInt(data.slice(37, 39), 16);
+    const float_value = parseInt(data.slice(39, 41), 16)
 
-        yield saveSensorData(user_id, measurement.toFixed(2), 1, sensor_tag);
-        // return random_number;
-    } catch (error) {
-      console.log('Error');
+    const sensor_value = [decimal_value, '.', float_value].join('');
+    const measurement = parseFloat(sensor_value);
+    
+    const user_id = localStorage.getItem('user_id');
+    const random_number = Math.random()*70
+
+    const values = yield saveSensorData(user_id, random_number.toFixed(2), 1, sensor_tag);
+    // const values = yield saveSensorData(user_id, measurement.toFixed(2), 1, sensor_tag);
+    yield put(BasicConfigAction.append_measurements(values));
+  } catch (error) {
+    const { failures } = store.getState().BasicConfigurationReducer;
+    
+    if (!failures.get_sensor_data) {
+      yield put(BasicConfigAction.get_sensor_data_failure());
+      message.error('Erro ao enviar dados para o dispositivo.');
     }
+    console.log({failures});
+  }
 }
 
-export function* saveSensorData(
-  user_id, measure, measurement_type=1, tag) {
-    try {
-        const { data } = yield api.post('/measurements', {
-          user_id, measure, type_id: measurement_type, tag
-        }).then((response) => response);
-        
-        console.log({data});
-        
-        yield put(BasicConfigAction.append_measurements(data));
-      } catch (error) {
-        console.log({error})
-        notification.error({ message: 'error'});
+export function* saveSensorData(user_id, measure, measurement_type=1, tag) {
+  try {
+    const { data } = yield api.post('/measurements', {
+      user_id, measure, type_id: measurement_type, tag
+    }).then((response) => response);
+    
+    // yield put(BasicConfigAction.append_measurements(data));
+    return data;
+  } catch (error) {
+    const { failures } = store.getState().BasicConfigurationReducer;
+    
+    if (!failures.save_sensor_data) {
+      yield put(BasicConfigAction.save_sensor_data_failure());
+      message.error({ message: 'Erro ao tentar inserir no banco de dados.'});
     }
+  }
 }
 
 export function* getMeasurements({ user_id, measurement_type }){

@@ -14,7 +14,13 @@ const INITIAL_STATE = {
       end_time: String
   },
 
-  measurements: []
+  measurements: [],
+
+  failures: {
+    save_sensor_data: false, 
+    get_sensor_data: false, 
+    get_measurement_data: false,
+  }
 };
 
 const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
@@ -32,7 +38,7 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
         return {
             ...state,
             basic_config: action.config,
-        }
+        };
 
     case ACTIONS_TYPE.APPEND_MEASUREMENTS:
       return {
@@ -44,7 +50,37 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         measurements: action.data,
-      }
+      };
+
+    case ACTIONS_TYPE.SAVE_SENSOR_DATA_FAILURE: 
+      return {
+        ...state,
+        failures: { 
+          save_sensor_data: true, 
+          get_sensor_data: state.failures.get_sensor_data, 
+          get_measurement_data: state.failures.get_measurement_data,
+         }
+      };
+
+    case ACTIONS_TYPE.GET_SENSOR_DATA_FAILURE: 
+      return {
+        ...state,
+        failures: { 
+          save_sensor_data: state.failures.save_sensor_data, 
+          get_sensor_data: true, 
+          get_measurement_data: state.failures.get_measurement_data,
+         }
+      };
+
+    case ACTIONS_TYPE.GET_MEASUREMENT_DATA_FAILURE: 
+      return {
+        ...state,
+        failures: { 
+          save_sensor_data: state.failures.save_sensor_data, 
+          get_sensor_data: state.failures.get_sensor_data, 
+          get_measurement_data: true,
+        }
+      };
 
     default:
       return state;

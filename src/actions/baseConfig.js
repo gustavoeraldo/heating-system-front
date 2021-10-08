@@ -2,10 +2,25 @@ export const ACTIONS_TYPE = {
     SAVE_BASIC_CONFIG: 'SAVE_BASIC_CONFIG',
     APPEND_MEASUREMENTS: 'APPEND_MEASUREMENTS',
     SAVE_VALUES: 'SAVE_VALUES',
+    SAVE_SENSOR_DATA_FAILURE: 'SAVE_SENSOR_DATA_FAILURE',
+    GET_SENSOR_DATA_FAILURE: 'GET_SENSOR_DATA_FAILURE',
+    GET_MEASUREMENT_DATA_FAILURE: 'GET_MEASUREMENT_DATA_FAILURE',
     
     ASYNC_GET_SENSOR_VALUE: 'ASYNC_GET_SENSOR_VALUE',
     ASYNC_GET_MEASUREMENTS: 'ASYNC_GET_MEASUREMENTS',
 };
+
+export const save_sensor_data_failure = () => ({
+    type: ACTIONS_TYPE.SAVE_SENSOR_DATA_FAILURE,
+});
+
+export const get_sensor_data_failure = () => ({
+    type: ACTIONS_TYPE.GET_SENSOR_DATA_FAILURE,
+});
+
+export const get_measurement_data_failure = () => ({
+    type: ACTIONS_TYPE.GET_MEASUREMENT_DATA_FAILURE,
+});
 
 export const save_values = (data) => ({
     type: ACTIONS_TYPE.SAVE_VALUES,

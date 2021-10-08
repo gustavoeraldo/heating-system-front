@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card } from 'antd';
-import { PauseOutlined, PlayCircleOutlined, SettingOutlined } from '@ant-design/icons';
+import { 
+  PauseOutlined, 
+  PlayCircleOutlined, 
+  SettingOutlined 
+} from '@ant-design/icons';
 
 import LineGraph from '../../components/graph';
 import { SettingsModal } from '../../components';
@@ -11,8 +15,6 @@ import './styles.css';
 function Dashboard() {
   const dispatch = useDispatch();
   const { basic_config, measurements } = useSelector((state) => state.BasicConfigurationReducer);
-  const { user_id, measurement_type } = useSelector((state) => state.UsersReducer);
-  const [stop, setStop] = useState(0);
   const [measurementState, setMeasurementState] = useState(false);
   const [modalVisibility, setModalVisibility] = useState({ confiVisibility: false });
 
@@ -35,7 +37,7 @@ function Dashboard() {
     }else {
       const sensors = sensor_id.split('0').slice(1);
       for (let i in sensors) {
-        coded_message = `01${origin}${destiny}${command}0${sensors[i]}${extra_info}${check_sum}`;
+        coded_message = `01${origin}${destiny}${command}0${sensors[i]}${extra_info}${check_sum}`;        
         dispatch(BasicConfigAction.async_get_sensor_value(
           device_ip, coded_message, `Sensor ${sensors[i]}`)
         );
@@ -45,18 +47,12 @@ function Dashboard() {
 
   useEffect(() => {
     if(measurementState){
-      setTimeout(() => {
-        setStop(stop+1);
-        
+      setInterval(() => {
         sendCommandToEsp();
-        if (measurements.length < 1) {
-          dispatch(BasicConfigAction.async_get_measurements(user_id, measurement_type));
-        }
       }, 1000 / basic_config.frequency);
     }
   
-    }, [basic_config, stop, measurementState, 
-      measurements, user_id, measurement_type]);
+    }, [basic_config, measurementState, dispatch]);
 
   return (
     <body>
@@ -66,7 +62,7 @@ function Dashboard() {
     
     <main>
       <Card bordered={false}>
-        <LineGraph dataSource={measurements} key="dsakmda"/>
+        <LineGraph dataSource={measurements} frequency={basic_config.frequency} key="dsakmda"/>
       </Card>
 
       <SettingsModal 

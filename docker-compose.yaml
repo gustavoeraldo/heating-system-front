@@ -1,0 +1,9 @@
+version: '3'
+services: 
+  lora-front: 
+    build: .
+    image: heating-front:v2
+    ports:
+      - "3000:3000"
+
+    container_name: front-ctn
