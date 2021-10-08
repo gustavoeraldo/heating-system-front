@@ -18,6 +18,8 @@ function Dashboard() {
   const [measurementState, setMeasurementState] = useState(false);
   const [modalVisibility, setModalVisibility] = useState({ confiVisibility: false });
 
+  const [teste, setTest] = useState();
+
   async function sendCommandToEsp() {
     const { 
       origin, 
@@ -45,15 +47,24 @@ function Dashboard() {
     }
   }
 
+  function refreshRate() {
+    console.log('testando');
+    sendCommandToEsp();
+  }
+
   useEffect(() => {
     if(measurementState){
-      setInterval(() => {
-        sendCommandToEsp();
-      }, 1000 / basic_config.frequency);
+      setTest(
+        setInterval(refreshRate, 1000 / basic_config.frequency)
+      );
+    }else {
+      console.log('limpa interval');
+      clearInterval(teste);
     }
   
     }, [basic_config, measurementState, dispatch]);
 
+  console.log({measurementState});
   return (
     <body>
       <header class="temperature-monitoring-header">
