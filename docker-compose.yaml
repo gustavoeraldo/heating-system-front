@@ -1,9 +1,15 @@
 version: '3'
 services: 
   lora-front: 
-    build: .
-    image: heating-front:v2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ".env"
+    restart: unless-stopped
+    stop_grace_period: "3s"
+    image: "${IMAGE_NAME}:${SERVER_VERSION}"
     ports:
-      - "3000:3000"
+      - "${DOCKER_WEB_PORT_FORWARD}:3000"
 
-    container_name: front-ctn
+    container_name: "${CONTAINER_NAME}"

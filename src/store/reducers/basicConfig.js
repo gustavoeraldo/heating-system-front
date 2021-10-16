@@ -13,6 +13,7 @@ const INITIAL_STATE = {
       start_time: String,
       end_time: String
   },
+  logsMessages: [],
 
   measurements: [],
 
@@ -20,7 +21,9 @@ const INITIAL_STATE = {
     save_sensor_data: false, 
     get_sensor_data: false, 
     get_measurement_data: false,
-  }
+  },
+
+  stop_measuring: false
 };
 
 const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
@@ -37,6 +40,7 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
 
         return {
             ...state,
+            stop_measuring: false,
             basic_config: action.config,
         };
 
@@ -55,6 +59,7 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS_TYPE.SAVE_SENSOR_DATA_FAILURE: 
       return {
         ...state,
+        stop_measuring: true,
         failures: { 
           save_sensor_data: true, 
           get_sensor_data: state.failures.get_sensor_data, 
@@ -65,6 +70,7 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS_TYPE.GET_SENSOR_DATA_FAILURE: 
       return {
         ...state,
+        stop_measuring: true,
         failures: { 
           save_sensor_data: state.failures.save_sensor_data, 
           get_sensor_data: true, 
@@ -75,11 +81,35 @@ const BasicConfigurationReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS_TYPE.GET_MEASUREMENT_DATA_FAILURE: 
       return {
         ...state,
+        stop_measuring: true,
         failures: { 
           save_sensor_data: state.failures.save_sensor_data, 
           get_sensor_data: state.failures.get_sensor_data, 
           get_measurement_data: true,
         }
+      };
+    
+    case ACTIONS_TYPE.SAVE_LOG:
+      return {
+        ...state,
+        logsMessages: [...state.logsMessages, ...action.data]
+      };
+    
+    case ACTIONS_TYPE.CLEAR_ERRORS: 
+      return {
+        ...state,
+        stop_measuring: false,
+        failures: {
+          save_sensor_data: false, 
+          get_sensor_data: false, 
+          get_measurement_data: false,
+        }
+      }
+    
+    case ACTIONS_TYPE.CLEAR_LOGS: 
+      return {
+        ...state,
+        logsMessages: []
       };
 
     default:

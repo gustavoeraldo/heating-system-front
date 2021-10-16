@@ -4,7 +4,7 @@ import { Line } from '@ant-design/charts';
 
 import './styles.css';
 
-function LineGraph({ dataSource, frequency }) {
+function LineGraph({ dataSource }) {
   const graph_config = {
     data: dataSource,
     height: 600,
@@ -19,7 +19,6 @@ function LineGraph({ dataSource, frequency }) {
       },
     },
     xAxis: {
-      // tickCount: 7*(frequency/frequency),
       label: {
         formatter: function formatter(v) {
           const date = new Date(v);
@@ -46,8 +45,7 @@ function LineGraph({ dataSource, frequency }) {
 }
 
 LineGraph.propTypes = {
-  dataSource: PropTypes.func.isRequired,
-  frequency: PropTypes.number.isRequired,
+  dataSource: PropTypes.func.isRequired
 };
 
 export default LineGraph;

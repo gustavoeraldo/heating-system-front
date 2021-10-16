@@ -5,10 +5,26 @@ export const ACTIONS_TYPE = {
     SAVE_SENSOR_DATA_FAILURE: 'SAVE_SENSOR_DATA_FAILURE',
     GET_SENSOR_DATA_FAILURE: 'GET_SENSOR_DATA_FAILURE',
     GET_MEASUREMENT_DATA_FAILURE: 'GET_MEASUREMENT_DATA_FAILURE',
+    SAVE_LOG: 'SAVE_LOG',
+    CLEAR_LOGS: 'CLEAR_LOGS',
+    CLEAR_ERRORS: 'CLEAR_ERRORS',
     
     ASYNC_GET_SENSOR_VALUE: 'ASYNC_GET_SENSOR_VALUE',
     ASYNC_GET_MEASUREMENTS: 'ASYNC_GET_MEASUREMENTS',
 };
+
+export const clear_errors = () => ({
+    type: ACTIONS_TYPE.CLEAR_ERRORS,
+});
+
+export const clear_logs = () => ({
+    type: ACTIONS_TYPE.CLEAR_LOGS
+});
+
+export const save_log = (data) => ({
+    type: ACTIONS_TYPE.SAVE_LOG,
+    data
+});
 
 export const save_sensor_data_failure = () => ({
     type: ACTIONS_TYPE.SAVE_SENSOR_DATA_FAILURE,

@@ -25,7 +25,7 @@ export function* getSensorResponse({ device_ip, payload, sensor_tag }) {
     const { data } = yield esp_connection.get(`/${payload}`)
     .then((response) => response);
 
-    // console.log(data);
+    console.log(`Dado recebido do ESP: ${data}`);
     
     // Parsing data
     const decimal_value = parseInt(data.slice(89, 91), 16);
@@ -33,11 +33,24 @@ export function* getSensorResponse({ device_ip, payload, sensor_tag }) {
 
     const sensor_value = [decimal_value, '.', float_value].join('');
     const measurement = parseFloat(sensor_value);
+
+    // let fake_value = 'ffff'
     
     const user_id = localStorage.getItem('user_id');
-    const random_number = Math.random()*70
+    // const random_number = Math.random()*70;
 
-    // const values = yield saveSensorData(user_id, random_number.toFixed(2), 1, sensor_tag);
+    console.log(`Dado enviado [sensor: ${sensor_tag}] para o banco: ${measurement}`);
+
+    yield put(BasicConfigAction.save_log([{
+      type: 'success',
+      message: `Dado recebido do ESP: ${data}`
+    }, 
+    {
+      type: 'success',
+      message: `Dado enviado [sensor: ${sensor_tag}] para o banco: ${measurement}`
+    }]));
+
+    // const values = yield saveSensorData(user_id, fake_value, 1, sensor_tag);
     const values = yield saveSensorData(user_id, measurement.toFixed(2), 1, sensor_tag);
     yield put(BasicConfigAction.append_measurements(values));
   } catch (error) {
@@ -46,8 +59,13 @@ export function* getSensorResponse({ device_ip, payload, sensor_tag }) {
     if (!failures.get_sensor_data) {
       yield put(BasicConfigAction.get_sensor_data_failure());
       message.error('Erro ao enviar dados para o dispositivo.');
+
+      console.log({error});
+      yield put(BasicConfigAction.save_log([{
+        type: 'error',
+        message: 'Erro ao enviar dados para o dispositivo.'
+      }]));
     }
-    // console.log({failures});
   }
 }
 
@@ -64,8 +82,16 @@ export function* saveSensorData(user_id, measure, measurement_type=1, tag) {
     
     if (!failures.save_sensor_data) {
       yield put(BasicConfigAction.save_sensor_data_failure());
-      message.error({ message: 'Erro ao tentar inserir no banco de dados.'});
+      message.error('Erro ao tentar inserir no banco de dados.');
+      yield put(BasicConfigAction.save_log([{
+        type: 'error',
+        message: `Erro ao tentar inserir no banco de dados.
+        Motivo: ${error.response.data.detail[0].msg}`
+      }]));
     }
+
+    console.log({error});
+    return [];
   }
 }
 

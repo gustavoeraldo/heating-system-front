@@ -19,7 +19,7 @@ export function* getUsers() {
         yield put(UsersAction.save_users_list(users_list));
         // return data;
     } catch (error) {
-      message.error({ message: 'Error' });
+      message.error('Error');
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -12,7 +12,11 @@ import {
     Button,
     message,
 } from 'antd';
-import { CloseCircleOutlined, ControlOutlined } from '@ant-design/icons';
+import { 
+    CloseCircleOutlined, 
+    ControlOutlined, 
+    UserOutlined 
+} from '@ant-design/icons';
 
 import { BasicConfigAction, UsersAction } from '../../actions';
 
@@ -22,12 +26,14 @@ function SettingsModal({ visible, onCancel }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   
-  const { users_list } = useSelector((state) => state.UsersReducer);
+  const { users_list, user_id } = useSelector((state) => state.UsersReducer);
   const { basic_config } = useSelector((state) => state.BasicConfigurationReducer);
+  const [user_name, setUsername] = useState();
 
-  function saveUserSettings({ user_id, measurement_type }) {
-    console.log({ user_id, measurement_type });
-    dispatch(UsersAction.save_user_info(user_id, measurement_type));
+  function saveUserSettings({ user_name, measurement_type }) {
+    const { usr_id } = users_list.filter((user) => user.username === user_name)[0];
+
+    dispatch(UsersAction.save_user_info(usr_id, measurement_type));
     message.success('Configuração salva');
   }
 
@@ -67,8 +73,21 @@ function SettingsModal({ visible, onCancel }) {
   useEffect(() => {
       if (users_list.length < 1) {
         dispatch(UsersAction.async_get_users());
+      }else {
+        try {
+            setUsername(
+                users_list.filter((user) => parseInt(user.usr_id, 10) === parseInt(user_id, 10))[0].username);          
+          } catch (error) {
+              console.log('Could not get the username');
+          }
       }
-  }, [users_list, basic_config, dispatch]);
+    
+      
+
+  }, [users_list, basic_config, user_name, dispatch]);
+
+  console.log({users_list})
+  console.log({user_name})
 
   return (
     <Modal 
@@ -82,20 +101,25 @@ function SettingsModal({ visible, onCancel }) {
         closeIcon={<CloseCircleOutlined style={{ color: 'red' }} />}
         >
         <Tabs defaultActiveKey="1" tabPosition="left" onChange={()=> {}}>
-            <TabPane tab="Configuração de usuário" key="connection-tab">
+            <TabPane tab={
+                <span>
+                    <UserOutlined /> Configuração de usuário
+                </span>} 
+                key="connection-tab" >
                 <Card bordered={false}>
                     <Form 
                         form={form} 
                         onFinish={saveUserSettings} 
                         size="large"
                         initialValues={{
-                            measurement_type: 'temperature'
+                            measurement_type: 'temperature',
+                            user_name
                         }}>
-                        <Form.Item label="Usuário" name="user_id">
+                        <Form.Item label="Usuário" name="user_name">
                             <Select>
                                 {
                                     users_list.map((user) => (
-                                        <Option value={user.usr_id} key={`usr-${user.usr_id}`}>
+                                        <Option value={user.username} key={`usr-${user.usr_id}`}>
                                             {user.username}
                                         </Option>
                                     ))

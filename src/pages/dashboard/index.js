@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card } from 'antd';
+import { Button, Card, Space } from 'antd';
 import { 
   PauseOutlined, 
   PlayCircleOutlined, 
-  SettingOutlined 
+  SettingOutlined ,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  BarChartOutlined,
+  ClearOutlined,
 } from '@ant-design/icons';
 
 import LineGraph from '../../components/graph';
-import { SettingsModal } from '../../components';
+import { SettingsModal, LogBox } from '../../components';
 import { BasicConfigAction } from '../../actions';
 import './styles.css';
 
 function Dashboard() {
   const dispatch = useDispatch();
-  const { basic_config, measurements } = useSelector((state) => state.BasicConfigurationReducer);
+  const { basic_config, measurements, stop_measuring, failures } = useSelector((state) => state.BasicConfigurationReducer);
   const [measurementState, setMeasurementState] = useState(false);
+  const [viewLogs, setViewLogs] = useState(false);
   const [modalVisibility, setModalVisibility] = useState({ confiVisibility: false });
 
   const [teste, setTest] = useState();
@@ -53,18 +58,20 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    if(measurementState){
+    if(measurementState && !stop_measuring){
       setTest(
         setInterval(refreshRate, 1000 / basic_config.frequency)
       );
     }else {
-      console.log('limpa interval');
       clearInterval(teste);
     }
   
-    }, [basic_config, measurementState, dispatch]);
+    }, [basic_config, measurementState, dispatch, stop_measuring]);
 
-  console.log({measurementState});
+  useEffect(() => {}, [failures])
+  
+  console.log({failures})
+
   return (
     <body>
       <header class="temperature-monitoring-header">
@@ -72,32 +79,69 @@ function Dashboard() {
       </header>
     
     <main>
-      <Card bordered={false}>
-        <LineGraph dataSource={measurements} frequency={basic_config.frequency} key="dsakmda"/>
+      <Card
+        extra={[
+          <Space>
+            <Button 
+            key="set-config-btn" 
+            size="large"
+            onClick={()=> setModalVisibility({ confiVisibility: true })}
+            >
+              <SettingOutlined /> Configurações
+          </Button>
+        
+          {
+            !measurementState ?
+            <Button size="large" type="primary" onClick={()=> {
+              setMeasurementState(true); 
+              dispatch(BasicConfigAction.clear_errors());
+              }}>
+              Iniciar aquisição <PlayCircleOutlined />
+            </Button> 
+            :
+            <Button size="large" type="danger" onClick={()=> setMeasurementState(false)}>
+              Pausar aquisição <PauseOutlined />
+            </Button>
+          }
+
+          {/* <Button size="large" type="primary">Extrair dados <BarChartOutlined /></Button> */}
+
+          { !viewLogs?
+            <Button 
+            onClick={() => setViewLogs(true)} size="large" type="primary">
+              Visualizar logs <EyeOutlined />
+            </Button>
+            :
+            <Button
+            onClick={() => setViewLogs(false)} size="large" type="primary">
+              Desabilitar logs <EyeInvisibleOutlined />
+            </Button>
+          }
+          </Space>
+        ]}
+        bordered 
+        bodyStyle={{ border: '1px solid', width: '1000px' }}
+        >
+          <Card bordered={false}>
+            <LineGraph dataSource={measurements} frequency={basic_config.frequency} key="dsakmda"/>
+          </Card>
+
+          {viewLogs && 
+            <Card bordered={false} extra={
+              <Button danger onClick={() => dispatch(BasicConfigAction.clear_logs())} >
+                Limpar logs <ClearOutlined />
+              </Button>
+            }>
+              <LogBox visible={viewLogs}/>
+            </Card>
+          }
+        
       </Card>
 
       <SettingsModal 
         visible={modalVisibility.confiVisibility} 
-        onCancel={()=> setModalVisibility({ confiVisibility: false })}/>
-
-      <Button 
-        key="set-config-btn" 
-        size="large"
-        onClick={()=> setModalVisibility({ confiVisibility: true })}
-        >
-          <SettingOutlined /> Configuração de uso
-      </Button>
-      
-      {
-        !measurementState ?
-        <Button size="large" type="primary" onClick={()=> setMeasurementState(true)}>
-          Iniciar aquisição <PlayCircleOutlined />
-        </Button> 
-        :
-        <Button size="large" type="danger" onClick={()=> setMeasurementState(false)}>
-          Pausar aquisição <PauseOutlined />
-        </Button>
-      }
+        onCancel={()=> setModalVisibility({ confiVisibility: false })}
+      />
 
     </main>
   </body>
